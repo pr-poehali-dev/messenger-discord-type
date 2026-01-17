@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +18,18 @@ export default function SettingsPanel({ onSettingsChange }: SettingsPanelProps =
   const [fontSize, setFontSize] = useState([14]);
   const [language, setLanguage] = useState('ru');
   const [autoDownload, setAutoDownload] = useState(true);
+
+  useEffect(() => {
+    document.documentElement.style.fontSize = `${fontSize[0]}px`;
+  }, [fontSize]);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   return (
     <div className="flex-1 bg-background overflow-y-auto scrollbar-thin">

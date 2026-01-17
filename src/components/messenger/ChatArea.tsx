@@ -71,49 +71,39 @@ export default function ChatArea({ selectedChat, currentUser, onMessageSent }: C
     };
 
     setMessages([...messages, newMessage]);
+    const userMessage = inputMessage;
     setInputMessage('');
     onMessageSent?.();
 
-    if (inputMessage.startsWith('/')) {
-      handleBotCommand(inputMessage);
+    if (selectedChat === 'bot') {
+      handleAIResponse(userMessage);
     }
   };
 
-  const handleBotCommand = (command: string) => {
-    if (selectedChat !== 'bot') return;
-    
+  const handleAIResponse = (userMessage: string) => {
     setTimeout(() => {
-      let botResponse = '';
+      const responses = [
+        `🤔 Интересный вопрос! По поводу "${userMessage}" я думаю, что всё зависит от контекста. Расскажи подробнее?`,
+        `💡 Отлично! Я могу помочь с этим. Вот что я думаю о "${userMessage}": это действительно важная тема. Что ещё тебя интересует?`,
+        `✨ Понимаю твой запрос. Относительно "${userMessage}" могу сказать, что это заслуживает внимания. Есть несколько подходов к решению.`,
+        `🎯 Отличный вопрос! По поводу "${userMessage}" могу предложить несколько идей. Что именно тебя интересует больше всего?`,
+        `🚀 Супер! Твой запрос "${userMessage}" очень актуален. Я готов обсудить это подробнее. Задай уточняющие вопросы!`,
+      ];
       
-      if (command === '/help') {
-        botResponse = '📋 Доступные команды:\n/help - эта справка\n/random - случайное число\n/joke - случайная шутка\n/time - текущее время';
-      } else if (command === '/random') {
-        botResponse = `🎲 Твое случайное число: ${Math.floor(Math.random() * 100)}`;
-      } else if (command === '/joke') {
-        const jokes = [
-          '😄 Почему программисты путают Хэллоуин и Рождество? Потому что Oct 31 == Dec 25!',
-          '🤓 Сколько программистов нужно, чтобы поменять лампочку? Ни одного, это аппаратная проблема!',
-          '💻 Как программист может выйти из душа? Читает инструкцию на шампуне: "Намылить, смыть, повторить"',
-        ];
-        botResponse = jokes[Math.floor(Math.random() * jokes.length)];
-      } else if (command === '/time') {
-        botResponse = `⏰ Текущее время: ${new Date().toLocaleTimeString('ru-RU')}`;
-      } else {
-        botResponse = '❓ Неизвестная команда. Используй /help для списка команд.';
-      }
+      const botResponse = responses[Math.floor(Math.random() * responses.length)];
 
       const botMessage: Message = {
-        id: Date.now().toString(),
+        id: (Date.now() + 1).toString(),
         userId: 'bot',
-        username: '🤖 Бот-помощник',
-        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=bot',
+        username: '🤖 AI Помощник',
+        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=assistant',
         content: botResponse,
         timestamp: new Date(),
         isBot: true,
       };
 
       setMessages(prev => [...prev, botMessage]);
-    }, 500);
+    }, 800);
   };
 
   const handleEmojiClick = (emoji: string) => {

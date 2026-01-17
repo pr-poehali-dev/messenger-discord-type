@@ -11,23 +11,18 @@ interface ChatListProps {
   onSelectChat: (chatId: string) => void;
 }
 
-export const channels = [
-  { id: 'general', name: 'Общий', icon: '💬', unread: 3, lastMessage: 'Привет всем!', type: 'channel' as const },
-  { id: 'random', name: 'Флудилка', icon: '🎲', unread: 0, lastMessage: 'Кто-нибудь видел...', type: 'channel' as const },
-  { id: 'tech', name: 'Технологии', icon: '💻', unread: 7, lastMessage: 'Новая версия вышла!', type: 'channel' as const },
-  { id: 'design', name: 'Дизайн', icon: '🎨', unread: 0, lastMessage: 'Посмотрите мокап', type: 'channel' as const },
-  { id: 'bot', name: '🤖 Бот-помощник', icon: '🤖', unread: 0, lastMessage: 'Напиши /help для помощи', type: 'channel' as const },
-];
+export const channels: any[] = [];
 
 export const friends = [
-  { id: 'user1', name: 'Алексей', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex', status: 'online' as const, unread: 2, type: 'dm' as const },
-  { id: 'user2', name: 'Мария', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Maria', status: 'away' as const, unread: 0, type: 'dm' as const },
-  { id: 'user3', name: 'Дмитрий', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Dmitry', status: 'online' as const, unread: 1, type: 'dm' as const },
+  { id: 'bot', name: '🤖 AI Помощник', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=assistant', status: 'online' as const, unread: 0, type: 'dm' as const, lastMessage: 'Спроси меня о чём угодно!' },
+  { id: 'user1', name: 'Алексей', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex', status: 'online' as const, unread: 2, type: 'dm' as const, lastMessage: 'Как дела?' },
+  { id: 'user2', name: 'Мария', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Maria', status: 'away' as const, unread: 0, type: 'dm' as const, lastMessage: 'Увидимся завтра' },
+  { id: 'user3', name: 'Дмитрий', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Dmitry', status: 'online' as const, unread: 1, type: 'dm' as const, lastMessage: 'Отлично!' },
 ];
 
 export default function ChatList({ selectedChat, onSelectChat }: ChatListProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'channels' | 'friends'>('channels');
+  const [activeTab, setActiveTab] = useState<'channels' | 'friends'>('friends');
 
   const filteredChannels = channels.filter(c => 
     c.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -53,49 +48,11 @@ export default function ChatList({ selectedChat, onSelectChat }: ChatListProps) 
         </div>
       </div>
 
-      <div className="flex border-b border-border">
-        <Button
-          variant={activeTab === 'channels' ? 'default' : 'ghost'}
-          className="flex-1 rounded-none"
-          onClick={() => setActiveTab('channels')}
-        >
-          <Icon name="Hash" size={18} className="mr-2" />
-          Каналы
-        </Button>
-        <Button
-          variant={activeTab === 'friends' ? 'default' : 'ghost'}
-          className="flex-1 rounded-none"
-          onClick={() => setActiveTab('friends')}
-        >
-          <Icon name="Users" size={18} className="mr-2" />
-          Друзья
-        </Button>
-      </div>
+
 
       <ScrollArea className="flex-1 scrollbar-thin">
         <div className="p-2">
-          {activeTab === 'channels' && filteredChannels.map((channel) => (
-            <button
-              key={channel.id}
-              onClick={() => onSelectChat(channel.id)}
-              className={`w-full p-3 rounded-lg mb-1 flex items-center gap-3 transition-all hover:bg-accent ${
-                selectedChat === channel.id ? 'bg-accent' : ''
-              }`}
-            >
-              <div className="text-2xl">{channel.icon}</div>
-              <div className="flex-1 text-left">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">{channel.name}</h3>
-                  {channel.unread > 0 && (
-                    <Badge className="bg-primary">{channel.unread}</Badge>
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground truncate">{channel.lastMessage}</p>
-              </div>
-            </button>
-          ))}
-
-          {activeTab === 'friends' && filteredFriends.map((friend) => (
+          {filteredFriends.map((friend) => (
             <button
               key={friend.id}
               onClick={() => onSelectChat(friend.id)}
@@ -119,8 +76,8 @@ export default function ChatList({ selectedChat, onSelectChat }: ChatListProps) 
                     <Badge className="bg-primary">{friend.unread}</Badge>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {friend.status === 'online' ? 'В сети' : 'Отошел'}
+                <p className="text-sm text-muted-foreground truncate">
+                  {(friend as any).lastMessage || (friend.status === 'online' ? 'В сети' : 'Отошел')}
                 </p>
               </div>
             </button>
@@ -128,12 +85,7 @@ export default function ChatList({ selectedChat, onSelectChat }: ChatListProps) 
         </div>
       </ScrollArea>
 
-      <div className="p-4 border-t border-border">
-        <Button className="w-full" variant="outline">
-          <Icon name="Plus" size={18} className="mr-2" />
-          Создать канал
-        </Button>
-      </div>
+
     </div>
   );
 }

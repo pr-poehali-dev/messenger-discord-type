@@ -11,7 +11,7 @@ interface MessengerLayoutProps {
 }
 
 export default function MessengerLayout({ currentUser, onLogout }: MessengerLayoutProps) {
-  const [selectedChat, setSelectedChat] = useState<string | null>('general');
+  const [selectedChat, setSelectedChat] = useState<string | null>('bot');
   const [activeView, setActiveView] = useState<'chats' | 'profile' | 'settings'>('chats');
   const [messageCount, setMessageCount] = useState(0);
 
