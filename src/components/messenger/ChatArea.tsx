@@ -4,11 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
+import { channels, friends } from './ChatList';
 
 interface ChatAreaProps {
   selectedChat: string | null;
   currentUser: { username: string; avatar: string };
+  onMessageSent?: () => void;
 }
 
 interface Message {
@@ -17,13 +20,14 @@ interface Message {
   username: string;
   avatar: string;
   content: string;
+  isBot?: boolean;
   timestamp: Date;
   reactions?: { emoji: string; count: number }[];
 }
 
 const emojis = ['👍', '❤️', '😂', '😮', '😢', '🔥', '🎉', '👏'];
 
-export default function ChatArea({ selectedChat, currentUser }: ChatAreaProps) {
+export default function ChatArea({ selectedChat, currentUser, onMessageSent }: ChatAreaProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -68,6 +72,7 @@ export default function ChatArea({ selectedChat, currentUser }: ChatAreaProps) {
 
     setMessages([...messages, newMessage]);
     setInputMessage('');
+    onMessageSent?.();
 
     if (inputMessage.startsWith('/')) {
       handleBotCommand(inputMessage);
@@ -75,11 +80,13 @@ export default function ChatArea({ selectedChat, currentUser }: ChatAreaProps) {
   };
 
   const handleBotCommand = (command: string) => {
+    if (selectedChat !== 'bot') return;
+    
     setTimeout(() => {
       let botResponse = '';
       
       if (command === '/help') {
-        botResponse = '📋 Доступные команды:\n/help - эта справка\n/random - случайное число\n/joke - случайная шутка';
+        botResponse = '📋 Доступные команды:\n/help - эта справка\n/random - случайное число\n/joke - случайная шутка\n/time - текущее время';
       } else if (command === '/random') {
         botResponse = `🎲 Твое случайное число: ${Math.floor(Math.random() * 100)}`;
       } else if (command === '/joke') {
@@ -89,6 +96,8 @@ export default function ChatArea({ selectedChat, currentUser }: ChatAreaProps) {
           '💻 Как программист может выйти из душа? Читает инструкцию на шампуне: "Намылить, смыть, повторить"',
         ];
         botResponse = jokes[Math.floor(Math.random() * jokes.length)];
+      } else if (command === '/time') {
+        botResponse = `⏰ Текущее время: ${new Date().toLocaleTimeString('ru-RU')}`;
       } else {
         botResponse = '❓ Неизвестная команда. Используй /help для списка команд.';
       }
@@ -100,6 +109,7 @@ export default function ChatArea({ selectedChat, currentUser }: ChatAreaProps) {
         avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=bot',
         content: botResponse,
         timestamp: new Date(),
+        isBot: true,
       };
 
       setMessages(prev => [...prev, botMessage]);
@@ -125,10 +135,39 @@ export default function ChatArea({ selectedChat, currentUser }: ChatAreaProps) {
 
   return (
     <div className="flex-1 flex flex-col bg-background">
-      <div className="h-16 border-b border-border flex items-center justify-between px-6">
+      <div className="h-16 border-b border-border flex items-center justify-between px-6 bg-card">
         <div className="flex items-center gap-3">
-          <h2 className="text-xl font-bold">#{selectedChat}</h2>
-          <Badge className="bg-green-500">24 онлайн</Badge>
+          {(() => {
+            const currentChat = [...channels, ...friends].find(c => c.id === selectedChat);
+            if (!currentChat) return null;
+            
+            if (currentChat.type === 'channel') {
+              return (
+                <>
+                  <div className="text-2xl">{currentChat.icon}</div>
+                  <div>
+                    <h2 className="text-lg font-bold">{currentChat.name}</h2>
+                    <p className="text-xs text-muted-foreground">Общий канал</p>
+                  </div>
+                </>
+              );
+            } else {
+              return (
+                <>
+                  <Avatar>
+                    <AvatarImage src={(currentChat as any).avatar} alt={currentChat.name} />
+                    <AvatarFallback>{currentChat.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h2 className="text-lg font-bold">{currentChat.name}</h2>
+                    <p className="text-xs text-muted-foreground">
+                      {(currentChat as any).status === 'online' ? '🟢 В сети' : '🟡 Отошел'}
+                    </p>
+                  </div>
+                </>
+              );
+            }
+          })()}
         </div>
         <div className="flex gap-2">
           <Button variant="ghost" size="icon">
@@ -223,13 +262,5 @@ export default function ChatArea({ selectedChat, currentUser }: ChatAreaProps) {
         </div>
       </div>
     </div>
-  );
-}
-
-function Badge({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${className}`}>
-      {children}
-    </span>
   );
 }

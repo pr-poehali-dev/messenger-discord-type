@@ -10,9 +10,12 @@ import Icon from '@/components/ui/icon';
 
 interface ProfilePanelProps {
   currentUser: { username: string; avatar: string };
+  totalMessages: number;
+  totalFriends: number;
+  totalChannels: number;
 }
 
-export default function ProfilePanel({ currentUser }: ProfilePanelProps) {
+export default function ProfilePanel({ currentUser, totalMessages, totalFriends, totalChannels }: ProfilePanelProps) {
   const [username, setUsername] = useState(currentUser.username);
   const [status, setStatus] = useState('Доступен для общения');
   const [bio, setBio] = useState('Люблю программирование и общение!');
@@ -156,17 +159,17 @@ export default function ProfilePanel({ currentUser }: ProfilePanelProps) {
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center p-4 bg-accent rounded-lg">
                 <Icon name="MessageSquare" size={32} className="mx-auto mb-2 text-primary" />
-                <div className="text-2xl font-bold">342</div>
+                <div className="text-2xl font-bold">{totalMessages}</div>
                 <div className="text-sm text-muted-foreground">Сообщений</div>
               </div>
               <div className="text-center p-4 bg-accent rounded-lg">
                 <Icon name="Users" size={32} className="mx-auto mb-2 text-secondary" />
-                <div className="text-2xl font-bold">28</div>
+                <div className="text-2xl font-bold">{totalFriends}</div>
                 <div className="text-sm text-muted-foreground">Друзей</div>
               </div>
               <div className="text-center p-4 bg-accent rounded-lg">
                 <Icon name="Hash" size={32} className="mx-auto mb-2 text-accent" />
-                <div className="text-2xl font-bold">12</div>
+                <div className="text-2xl font-bold">{totalChannels}</div>
                 <div className="text-sm text-muted-foreground">Каналов</div>
               </div>
             </div>

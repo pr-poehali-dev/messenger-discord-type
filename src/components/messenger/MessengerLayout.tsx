@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Sidebar from './Sidebar';
-import ChatList from './ChatList';
+import ChatList, { channels, friends } from './ChatList';
 import ChatArea from './ChatArea';
 import ProfilePanel from './ProfilePanel';
 import SettingsPanel from './SettingsPanel';
@@ -13,6 +13,13 @@ interface MessengerLayoutProps {
 export default function MessengerLayout({ currentUser, onLogout }: MessengerLayoutProps) {
   const [selectedChat, setSelectedChat] = useState<string | null>('general');
   const [activeView, setActiveView] = useState<'chats' | 'profile' | 'settings'>('chats');
+  const [messageCount, setMessageCount] = useState(0);
+
+  const stats = useMemo(() => ({
+    totalMessages: messageCount,
+    totalFriends: friends.length,
+    totalChannels: channels.length,
+  }), [messageCount]);
 
   return (
     <div className="h-screen flex bg-background overflow-hidden">
@@ -32,12 +39,18 @@ export default function MessengerLayout({ currentUser, onLogout }: MessengerLayo
           <ChatArea 
             selectedChat={selectedChat}
             currentUser={currentUser}
+            onMessageSent={() => setMessageCount(prev => prev + 1)}
           />
         </>
       )}
       
       {activeView === 'profile' && (
-        <ProfilePanel currentUser={currentUser} />
+        <ProfilePanel 
+          currentUser={currentUser}
+          totalMessages={stats.totalMessages}
+          totalFriends={stats.totalFriends}
+          totalChannels={stats.totalChannels}
+        />
       )}
       
       {activeView === 'settings' && (

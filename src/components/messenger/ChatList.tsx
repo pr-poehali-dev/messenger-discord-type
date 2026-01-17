@@ -11,23 +11,31 @@ interface ChatListProps {
   onSelectChat: (chatId: string) => void;
 }
 
-const channels = [
-  { id: 'general', name: 'Общий', icon: '💬', unread: 3, lastMessage: 'Привет всем!' },
-  { id: 'random', name: 'Флудилка', icon: '🎲', unread: 0, lastMessage: 'Кто-нибудь видел...' },
-  { id: 'tech', name: 'Технологии', icon: '💻', unread: 7, lastMessage: 'Новая версия вышла!' },
-  { id: 'design', name: 'Дизайн', icon: '🎨', unread: 0, lastMessage: 'Посмотрите мокап' },
+export const channels = [
+  { id: 'general', name: 'Общий', icon: '💬', unread: 3, lastMessage: 'Привет всем!', type: 'channel' as const },
+  { id: 'random', name: 'Флудилка', icon: '🎲', unread: 0, lastMessage: 'Кто-нибудь видел...', type: 'channel' as const },
+  { id: 'tech', name: 'Технологии', icon: '💻', unread: 7, lastMessage: 'Новая версия вышла!', type: 'channel' as const },
+  { id: 'design', name: 'Дизайн', icon: '🎨', unread: 0, lastMessage: 'Посмотрите мокап', type: 'channel' as const },
+  { id: 'bot', name: '🤖 Бот-помощник', icon: '🤖', unread: 0, lastMessage: 'Напиши /help для помощи', type: 'channel' as const },
 ];
 
-const friends = [
-  { id: 'user1', name: 'Алексей', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex', status: 'online', unread: 2 },
-  { id: 'user2', name: 'Мария', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Maria', status: 'away', unread: 0 },
-  { id: 'user3', name: 'Дмитрий', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Dmitry', status: 'online', unread: 1 },
-  { id: 'bot', name: '🤖 Бот-помощник', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=bot', status: 'online', unread: 0 },
+export const friends = [
+  { id: 'user1', name: 'Алексей', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex', status: 'online' as const, unread: 2, type: 'dm' as const },
+  { id: 'user2', name: 'Мария', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Maria', status: 'away' as const, unread: 0, type: 'dm' as const },
+  { id: 'user3', name: 'Дмитрий', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Dmitry', status: 'online' as const, unread: 1, type: 'dm' as const },
 ];
 
 export default function ChatList({ selectedChat, onSelectChat }: ChatListProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'channels' | 'friends'>('channels');
+
+  const filteredChannels = channels.filter(c => 
+    c.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredFriends = friends.filter(f => 
+    f.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="w-80 bg-card border-r border-border flex flex-col">
@@ -66,7 +74,7 @@ export default function ChatList({ selectedChat, onSelectChat }: ChatListProps) 
 
       <ScrollArea className="flex-1 scrollbar-thin">
         <div className="p-2">
-          {activeTab === 'channels' && channels.map((channel) => (
+          {activeTab === 'channels' && filteredChannels.map((channel) => (
             <button
               key={channel.id}
               onClick={() => onSelectChat(channel.id)}
@@ -87,7 +95,7 @@ export default function ChatList({ selectedChat, onSelectChat }: ChatListProps) 
             </button>
           ))}
 
-          {activeTab === 'friends' && friends.map((friend) => (
+          {activeTab === 'friends' && filteredFriends.map((friend) => (
             <button
               key={friend.id}
               onClick={() => onSelectChat(friend.id)}

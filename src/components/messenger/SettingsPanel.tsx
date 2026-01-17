@@ -7,7 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import Icon from '@/components/ui/icon';
 
-export default function SettingsPanel() {
+interface SettingsPanelProps {
+  onSettingsChange?: (settings: { darkMode: boolean; fontSize: number; notifications: boolean; soundEnabled: boolean }) => void;
+}
+
+export default function SettingsPanel({ onSettingsChange }: SettingsPanelProps = {}) {
   const [notifications, setNotifications] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [darkMode, setDarkMode] = useState(true);
@@ -38,7 +42,10 @@ export default function SettingsPanel() {
               </div>
               <Switch
                 checked={notifications}
-                onCheckedChange={setNotifications}
+                onCheckedChange={(value) => {
+                  setNotifications(value);
+                  onSettingsChange?.({ darkMode, fontSize: fontSize[0], notifications: value, soundEnabled });
+                }}
               />
             </div>
 
@@ -51,7 +58,10 @@ export default function SettingsPanel() {
               </div>
               <Switch
                 checked={soundEnabled}
-                onCheckedChange={setSoundEnabled}
+                onCheckedChange={(value) => {
+                  setSoundEnabled(value);
+                  onSettingsChange?.({ darkMode, fontSize: fontSize[0], notifications, soundEnabled: value });
+                }}
               />
             </div>
 
@@ -85,7 +95,10 @@ export default function SettingsPanel() {
               </div>
               <Switch
                 checked={darkMode}
-                onCheckedChange={setDarkMode}
+                onCheckedChange={(value) => {
+                  setDarkMode(value);
+                  onSettingsChange?.({ darkMode: value, fontSize: fontSize[0], notifications, soundEnabled });
+                }}
               />
             </div>
 
@@ -95,7 +108,10 @@ export default function SettingsPanel() {
                 <span className="text-sm text-muted-foreground">12px</span>
                 <Slider
                   value={fontSize}
-                  onValueChange={setFontSize}
+                  onValueChange={(value) => {
+                    setFontSize(value);
+                    onSettingsChange?.({ darkMode, fontSize: value[0], notifications, soundEnabled });
+                  }}
                   min={12}
                   max={20}
                   step={1}
